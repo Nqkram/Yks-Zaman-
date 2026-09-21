@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YKS Zaman Merkezi</title>
+<style>
+:root{
+  --bg:#0b1020;--panel:#121a2d;--panel2:#18233b;--text:#eef3ff;--muted:#9aa8c4;
+  --accent:#6ea8fe;--accent2:#7cf0c5;--danger:#ff6b7a;--border:#263452;
+}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(135deg,#080c18,#10182b 55%,#0b1222);color:var(--text);
+font-family:Inter,Segoe UI,Arial,sans-serif;min-height:100vh}
+header{padding:28px 22px 18px;max-width:1250px;margin:auto}
+h1{margin:0;font-size:32px}.sub{color:var(--muted);margin-top:7px}
+.container{max-width:1250px;margin:auto;padding:0 22px 40px}
+.tabs{display:flex;gap:8px;overflow:auto;padding:12px 0 18px;position:sticky;top:0;background:rgba(11,16,32,.92);backdrop-filter:blur(10px);z-index:5}
+.tab{border:1px solid var(--border);background:var(--panel);color:var(--text);padding:10px 15px;border-radius:12px;cursor:pointer;white-space:nowrap}
+.tab.active{background:var(--accent);color:#08101f;border-color:var(--accent)}
+.page{display:none}.page.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.card{background:rgba(18,26,45,.94);border:1px solid var(--border);border-radius:18px;padding:18px}
+.card h3{margin:0 0 7px}.desc{color:var(--muted);font-size:14px;line-height:1.45}
+button{border:0;border-radius:11px;padding:10px 14px;background:var(--accent);color:#07101f;font-weight:700;cursor:pointer}
+button.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--border)}
+button.danger{background:var(--danger);color:white}
+button:disabled{opacity:.45;cursor:not-allowed}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.timerBox{background:#080d19;border:1px solid var(--border);border-radius:18px;padding:24px;text-align:center;margin:16px 0}
+.time{font-size:clamp(54px,10vw,100px);font-weight:800;letter-spacing:2px;font-variant-numeric:tabular-nums}
+.status{color:var(--muted);min-height:22px}
+.presetGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:12px}
+.preset{padding:14px;border:1px solid var(--border);border-radius:14px;background:var(--panel2);cursor:pointer}
+.preset:hover{border-color:var(--accent)}
+input,select{width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:#0b1221;color:var(--text);outline:none}
+label{font-size:13px;color:var(--muted);display:block;margin:10px 0 5px}
+.formgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+.bigStat{font-size:38px;font-weight:800;margin:8px 0}
+.progress{height:9px;background:#0a1020;border-radius:99px;overflow:hidden;margin-top:14px}
+.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .2s}
+.question{font-size:15px;color:var(--muted);margin-top:10px}
+table{width:100%;border-collapse:collapse;margin-top:12px}td,th{padding:9px;border-bottom:1px solid var(--border);text-align:left}
+.note{padding:12px;border-left:3px solid var(--accent);background:#111a2c;color:var(--muted);border-radius:8px;margin-top:14px}
+footer{text-align:center;color:#64728e;padding:30px}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<header>
+  <h1>YKS Zaman Merkezi</h1>
+  <div class="sub">TYT • AYT • YDT • branş denemeleri • paragraf • geometri • soru temposu • pomodoro • kronometre</div>
+</header>
+
+<div class="container">
+<nav class="tabs">
+  <button class="tab active" data-page="exam">Deneme</button>
+  <button class="tab" data-page="branch">Branş</button>
+  <button class="tab" data-page="practice">Çalışma</button>
+  <button class="tab" data-page="stopwatch">Kronometre</button>
+  <button class="tab" data-page="pace">Soru Temposu</button>
+  <button class="tab" data-page="interval">Interval</button>
+  <button class="tab" data-page="history">Kayıtlar</button>
+</nav>
+
+<section id="exam" class="page active">
+  <div class="card">
+    <h2>Deneme Zamanlayıcıları</h2>
+    <div class="desc">Gerçek sınav simülasyonu veya kendi süreni ayarlayabileceğin geri sayım.</div>
+    <div class="presetGrid">
+      <div class="preset" onclick="startPreset('TYT Denemesi',165*60)">TYT Denemesi<br><b>165 dk</b></div>
+      <div class="preset" onclick="startPreset('AYT Denemesi',180*60)">AYT Denemesi<br><b>180 dk</b></div>
+      <div class="preset" onclick="startPreset('YDT Denemesi',120*60)">YDT Denemesi<br><b>120 dk</b></div>
+      <div class="preset" onclick="startPreset('Mini Deneme',60*60)">Mini Deneme<br><b>60 dk</b></div>
+      <div class="preset" onclick="startPreset('Hız Denemesi',30*60)">Hız Denemesi<br><b>30 dk</b></div>
+    </div>
+    <div class="formgrid">
+      <div><label>Özel deneme adı</label><input id="examName" value="Özel Deneme"></div>
+      <div><label>Süre (dakika)</label><input id="examMin" type="number" min="1" value="165"></div>
+    </div>
+    <div class="actions"><button onclick="startCustomExam()">Başlat</button></div>
+  </div>
+
+  <div class="card">
+    <div class="timerBox">
+      <div class="status" id="timerLabel">Hazır</div>
+      <div class="time" id="timerDisplay">00:00:00</div>
+      <div class="progress"><i id="timerProgress"></i></div>
+      <div class="actions" style="justify-content:center">
+        <button id="startBtn" onclick="toggleTimer()">Başlat</button>
+        <button class="secondary" onclick="resetTimer()">Sıfırla</button>
+        <button class="secondary" onclick="addMinute(1)">+1 dk</button>
+        <button class="secondary" onclick="addMinute(5)">+5 dk</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="branch" class="page">
+  <div class="card">
+    <h2>Branş Denemesi</h2>
+    <div class="desc">Ders seç, süreyi belirle ve sadece o branşa odaklan.</div>
+    <div class="formgrid">
+      <div><label>Ders</label><select id="branchSubject">
+        <option>Türkçe</option><option>Matematik</option><option>Geometri</option><option>Fizik</option>
+        <option>Kimya</option><option>Biyoloji</option><option>Tarih</option><option>Coğrafya</option>
+        <option>Felsefe</option><option>Din Kültürü</option><option>İngilizce / YDT</option>
+      </select></div>
+      <div><label>Soru sayısı</label><input id="branchQ" type="number" value="40" min="1"></div>
+      <div><label>Süre (dk)</label><input id="branchMin" type="number" value="40" min="1"></div>
+    </div>
+    <div class="actions"><button onclick="startBranch()">Branşı Başlat</button></div>
+  </div>
+  <div class="card timerBox">
+    <div class="status" id="branchLabel">Branş bekliyor</div>
+    <div class="time" id="branchDisplay">00:00:00</div>
+    <div class="actions" style="justify-content:center">
+      <button onclick="toggleBranch()">Başlat</button><button class="secondary" onclick="resetBranch()">Sıfırla</button>
+    </div>
+  </div>
+</section>
+
+<section id="practice" class="page">
+  <div class="grid">
+    <div class="card"><h3>Paragraf</h3><div class="desc">Paragraf çözüm hızını ölç.</div>
+      <div class="formgrid"><div><label>Soru</label><input id="paraQ" type="number" value="20"></div><div><label>Süre (dk)</label><input id="paraMin" type="number" value="25"></div></div>
+      <button onclick="practiceStart('Paragraf', 'paraQ','paraMin')" style="margin-top:12px">Başlat</button></div>
+    <div class="card"><h3>Geometri</h3><div class="desc">Geometri için ayrı süre tut.</div>
+      <div class="formgrid"><div><label>Soru</label><input id="geoQ" type="number" value="15"></div><div><label>Süre (dk)</label><input id="geoMin" type="number" value="30"></div></div>
+      <button onclick="practiceStart('Geometri','geoQ','geoMin')" style="margin-top:12px">Başlat</button></div>
+    <div class="card"><h3>Matematik</h3><div class="desc">Belirli sayıda soruyu süre baskısıyla çöz.</div>
+      <div class="formgrid"><div><label>Soru</label><input id="matQ" type="number" value="20"></div><div><label>Süre (dk)</label><input id="matMin" type="number" value="30"></div></div>
+      <button onclick="practiceStart('Matematik','matQ','matMin')" style="margin-top:12px">Başlat</button></div>
+    <div class="card"><h3>Fen / Sosyal</h3><div class="desc">Kısa bloklarla branş antrenmanı.</div>
+      <div class="formgrid"><div><label>Soru</label><input id="fenQ" type="number" value="20"></div><div><label>Süre (dk)</label><input id="fenMin" type="number" value="25"></div></div>
+      <button onclick="practiceStart('Fen / Sosyal','fenQ','fenMin')" style="margin-top:12px">Başlat</button></div>
+  </div>
+  <div class="card timerBox">
+    <div class="status" id="practiceLabel">Çalışma hazır</div>
+    <div class="time" id="practiceDisplay">00:00:00</div>
+    <div class="question" id="practiceInfo"></div>
+    <div class="actions" style="justify-content:center"><button onclick="togglePractice()">Başlat / Duraklat</button><button class="secondary" onclick="resetPractice()">Sıfırla</button></div>
+  </div>
+</section>
+
+<section id="stopwatch" class="page">
+  <div class="card timerBox">
+    <h2>Serbest Kronometre</h2>
+    <div class="desc">Süre sınırı olmadan çözüm süresini ölç.</div>
+    <div class="time" id="swDisplay">00:00:00.00</div>
+    <div class="actions" style="justify-content:center">
+      <button onclick="swToggle()">Başlat / Duraklat</button><button class="secondary" onclick="swLap()">Tur</button><button class="secondary" onclick="swReset()">Sıfırla</button>
+    </div>
+    <table><thead><tr><th>Tur</th><th>Süre</th></tr></thead><tbody id="laps"></tbody></table>
+  </div>
+</section>
+
+<section id="pace" class="page">
+  <div class="card">
+    <h2>Soru Temposu Hesaplayıcı</h2>
+    <div class="desc">Bir soruya ortalama kaç saniye ayırabileceğini hesapla. Bu bir hedef tempo aracıdır; gerçek süreler ders ve soru tipine göre değişir.</div>
+    <div class="formgrid">
+      <div><label>Soru sayısı</label><input id="paceQ" type="number" value="40"></div>
+      <div><label>Toplam süre (dk)</label><input id="paceMin" type="number" value="40"></div>
+    </div>
+    <div class="bigStat" id="paceResult">—</div>
+    <div class="actions"><button onclick="calcPace()">Hesapla</button></div>
+  </div>
+  <div class="card">
+    <h3>Hazır tempo hesapları</h3>
+    <table><thead><tr><th>Çalışma</th><th>Soru</th><th>Süre</th><th>Ortalama</th></tr></thead>
+    <tbody id="paceTable"></tbody></table>
+  </div>
+</section>
+
+<section id="interval" class="page">
+  <div class="card">
+    <h2>Pomodoro / Interval</h2>
+    <div class="desc">Ders, kısa mola ve uzun mola döngülerini otomatik çalıştır.</div>
+    <div class="formgrid">
+      <div><label>Ders (dk)</label><input id="workMin" type="number" value="50" min="1"></div>
+      <div><label>Kısa mola (dk)</label><input id="shortMin" type="number" value="10" min="1"></div>
+      <div><label>Uzun mola (dk)</label><input id="longMin" type="number" value="25" min="1"></div>
+      <div><label>Uzun moladan önce tur</label><input id="rounds" type="number" value="4" min="1"></div>
+    </div>
+    <div class="timerBox">
+      <div class="status" id="intervalLabel">Ders başlamaya hazır</div>
+      <div class="time" id="intervalDisplay">00:00</div>
+      <div class="question" id="roundInfo">Tur 1</div>
+      <div class="actions" style="justify-content:center">
+        <button onclick="intervalToggle()">Başlat / Duraklat</button><button class="secondary" onclick="intervalReset()">Sıfırla</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="history" class="page">
+  <div class="card">
+    <h2>Çalışma Kayıtları</h2>
+    <div class="desc">Tamamlanan zamanlayıcılar tarayıcının yerel hafızasına kaydedilir. Veriler cihazından dışarı gönderilmez.</div>
+    <div class="actions"><button class="danger" onclick="clearHistory()">Kayıtları Sil</button></div>
+    <table><thead><tr><th>Tarih</th><th>Çalışma</th><th>Süre</th></tr></thead><tbody id="historyBody"></tbody></table>
+  </div>
+</section>
+
+<div class="note">İpucu: Denemelerde yalnızca toplam süreyi değil, soru başına temponu ve hangi bölümde ne kadar zaman harcadığını da takip et. Bu araç sonuçlarını analiz etmek için değil, süre disiplinini geliştirmek için tasarlandı.</div>
+<footer>YKS Zaman Merkezi • Tek dosya • İnternetsiz çalışabilir</footer>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+let timer={name:'',total:0,left:0,running:false,id:null};
+let branch={total:0,left:0,running:false,id:null,name:''};
+let practice={total:0,left:0,running:false,id:null,name:'',q:0};
+let sw={ms:0,running:false,last:0,id:null,lap:0};
+let interval={phase:'work',left:0,running:false,id:null,round:1,started:false};
+
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active'); $(b.dataset.page).classList.add('active');
+});
+
+function fmt(s){s=Math.max(0,Math.ceil(s));let h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return [h,m,x].map(v=>String(v).padStart(2,'0')).join(':')}
+function fmtMS(ms){let s=Math.floor(ms/1000),cs=Math.floor((ms%1000)/10);return fmt(s)+'.'+String(cs).padStart(2,'0')}
+function beep(){
+  try{let c=new (window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();
+  o.connect(g);g.connect(c.destination);o.frequency.value=880;g.gain.value=.08;o.start();o.stop(c.currentTime+.25)}catch(e){}
+}
+function save(name,seconds){let h=JSON.parse(localStorage.getItem('yksHistory')||'[]');h.unshift({date:new Date().toLocaleString('tr-TR'),name,duration:seconds});h=h.slice(0,100);localStorage.setItem('yksHistory',JSON.stringify(h));renderHistory()}
+
+function startPreset(name,sec){timer={name,total:sec,left:sec,running:true,id:null};$('timerLabel').textContent=name;$('startBtn').textContent='Duraklat';runTimer()}
+function startCustomExam(){startPreset($('examName').value||'Özel Deneme',Number($('examMin').value)*60)}
+function runTimer(){clearInterval(timer.id);timer.id=setInterval(()=>{if(!timer.running)return;timer.left--;renderTimer();if(timer.left<=0){timer.left=0;timer.running=false;clearInterval(timer.id);beep();save(timer.name,timer.total);alert(timer.name+' tamamlandı.');$('startBtn').textContent='Başlat'}},1000);renderTimer()}
+function toggleTimer(){if(!timer.total){startPreset('TYT Denemesi',165*60);return}timer.running=!timer.running;$('startBtn').textContent=timer.running?'Duraklat':'Devam Et';if(timer.running)runTimer()}
+function resetTimer(){clearInterval(timer.id);timer={name:'',total:0,left:0,running:false,id:null};$('timerLabel').textContent='Hazır';$('timerDisplay').textContent='00:00:00';$('timerProgress').style.width='0%';$('startBtn').textContent='Başlat'}
+function addMinute(x){timer.left+=x*60;timer.total+=x*60;renderTimer()}
+function renderTimer(){$('timerDisplay').textContent=fmt(timer.left);$('timerProgress').style.width=(timer.total?((timer.total-timer.left)/timer.total*100):0)+'%'}
+
+function startBranch(){let q=Number($('branchQ').value),m=Number($('branchMin').value);branch={name:$('branchSubject').value+' Branş',total:m*60,left:m*60,running:true,id:null};$('branchLabel').textContent=branch.name+' • '+q+' soru';runBranch()}
+function runBranch(){clearInterval(branch.id);branch.id=setInterval(()=>{if(!branch.running)return;branch.left--;renderBranch();if(branch.left<=0){branch.left=0;branch.running=false;clearInterval(branch.id);beep();save(branch.name,branch.total);alert(branch.name+' tamamlandı.')}},1000);renderBranch()}
+function toggleBranch(){if(!branch.total){startBranch();return}branch.running=!branch.running;if(branch.running)runBranch()}
+function resetBranch(){clearInterval(branch.id);branch={total:0,left:0,running:false,id:null,name:''};$('branchDisplay').textContent='00:00:00';$('branchLabel').textContent='Branş bekliyor'}
+function renderBranch(){$('branchDisplay').textContent=fmt(branch.left)}
+
+function practiceStart(name,qid,mid){let q=Number($(qid).value),m=Number($(mid).value);practice={name,total:m*60,left:m*60,running:true,id:null,q};$('practiceLabel').textContent=name; $('practiceInfo').textContent=q+' soru • hedef ortalama '+Math.round((m*60/q))+' sn/soru';runPractice()}
+function runPractice(){clearInterval(practice.id);practice.id=setInterval(()=>{if(!practice.running)return;practice.left--;renderPractice();if(practice.left<=0){practice.left=0;practice.running=false;clearInterval(practice.id);beep();save(practice.name,practice.total);alert(practice.name+' tamamlandı.')}},1000);renderPractice()}
+function togglePractice(){if(!practice.total){practiceStart('Paragraf','paraQ','paraMin');return}practice.running=!practice.running;if(practice.running)runPractice()}
+function resetPractice(){clearInterval(practice.id);practice={total:0,left:0,running:false,id:null,name:'',q:0};$('practiceDisplay').textContent='00:00:00';$('practiceLabel').textContent='Çalışma hazır';$('practiceInfo').textContent=''}
+function renderPractice(){$('practiceDisplay').textContent=fmt(practice.left)}
+
+function swToggle(){sw.running=!sw.running;if(sw.running){sw.last=performance.now();clearInterval(sw.id);sw.id=setInterval(()=>{sw.ms+=performance.now()-sw.last;sw.last=performance.now();$('swDisplay').textContent=fmtMS(sw.ms)},30)}else clearInterval(sw.id)}
+function swLap(){if(!sw.running&&sw.ms===0)return;sw.lap++;let tr=document.createElement('tr');tr.innerHTML='<td>'+sw.lap+'</td><td>'+fmtMS(sw.ms)+'</td>';$('laps').prepend(tr)}
+function swReset(){clearInterval(sw.id);sw={ms:0,running:false,last:0,id:null,lap:0};$('swDisplay').textContent='00:00:00.00';$('laps').innerHTML=''}
+
+function calcPace(){let q=Number($('paceQ').value),m=Number($('paceMin').value);if(q>0&&m>0)$('paceResult').textContent=(m*60/q).toFixed(1)+' saniye / soru'}
+function renderPace(){
+ let rows=[['TYT Türkçe',40,40],['TYT Matematik',40,50],['Geometri',10,20],['Paragraf',20,25],['AYT Matematik',40,60],['Fen Branş',40,45]];
+ $('paceTable').innerHTML=rows.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+' dk</td><td>'+(r[2]*60/r[1]).toFixed(1)+' sn</td></tr>').join('')
+}
+
+function intervalSetup(){let w=Number($('workMin').value)||50,s=Number($('shortMin').value)||10,l=Number($('longMin').value)||25;interval.left=w*60;interval.phase='work';interval.round=1;interval.started=true;renderInterval()}
+function intervalToggle(){if(!interval.started)intervalSetup();interval.running=!interval.running;if(interval.running){clearInterval(interval.id);interval.id=setInterval(intervalTick,1000)}}
+function intervalTick(){if(!interval.running)return;interval.left--;if(interval.left<=0){beep();if(interval.phase==='work'){let rounds=Number($('rounds').value)||4;if(interval.round>=rounds){interval.phase='long';interval.left=(Number($('longMin').value)||25)*60}else{interval.phase='short';interval.left=(Number($('shortMin').value)||10)*60}}else if(interval.phase==='short'){interval.round++;interval.phase='work';interval.left=(Number($('workMin').value)||50)*60}else{interval.round++;interval.phase='work';interval.left=(Number($('workMin').value)||50)*60}}renderInterval()}
+function renderInterval(){$('intervalDisplay').textContent=fmt(interval.left).slice(3);$('intervalLabel').textContent=interval.phase==='work'?'Ders':interval.phase==='short'?'Kısa Mola':'Uzun Mola';$('roundInfo').textContent='Tur '+interval.round}
+function intervalReset(){clearInterval(interval.id);interval={phase:'work',left:0,running:false,id:null,round:1,started:false};$('intervalDisplay').textContent='00:00';$('intervalLabel').textContent='Ders başlamaya hazır';$('roundInfo').textContent='Tur 1'}
+
+function renderHistory(){let h=JSON.parse(localStorage.getItem('yksHistory')||'[]');$('historyBody').innerHTML=h.length?h.map(x=>'<tr><td>'+x.date+'</td><td>'+x.name+'</td><td>'+fmt(x.duration)+'</td></tr>').join(''):'<tr><td colspan="3">Henüz kayıt yok.</td></tr>'}
+function clearHistory(){if(confirm('Tüm kayıtlar silinsin mi?')){localStorage.removeItem('yksHistory');renderHistory()}}
+renderPace();renderHistory();calcPace();
+</script>
+</body>
+</html>
